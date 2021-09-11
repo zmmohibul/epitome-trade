@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: crops-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: crops
   template:
     metadata:
       labels:
-        app: auth
+        app: crops
     spec:
       containers:
-        - name: auth
-          image: us.gcr.io/epitome-trade/auth
+        - name: crops
+          image: us.gcr.io/epitome-trade/crops
           env:
             - name: MONGO_URI
-              value: 'mongodb://auth-mongo-srv:27017/auth'
+              value: 'mongodb://crops-mongo-srv:27017/crops'
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
@@ -27,12 +27,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: crops-srv
 spec:
   selector:
-    app: auth
+    app: crops
   ports:
-    - name: auth
+    - name: crops
       protocol: TCP
       port: 3000
       targetPort: 3000

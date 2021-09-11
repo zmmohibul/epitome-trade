@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crops-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crops-mongo
+  template:
+    metadata:
+      labels:
+        app: crops-mongo
+    spec:
+      containers:
+        - name: crops-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crops-mongo-srv
+spec:
+  selector:
+    app: crops-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

@@ -17,6 +17,13 @@ spec:
                 name: auth-srv
                 port:
                   number: 3000
+          - path: /api/crops/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: crops-srv
+                port:
+                  number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend:

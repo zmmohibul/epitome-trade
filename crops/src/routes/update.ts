@@ -7,6 +7,8 @@ import {
   NotAuthorizedError,
 } from '@miepitome/common';
 import { Crop } from '../models/crops';
+import { CropUpdatedPublisher } from "../events/publishers/crop-updated-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
 
@@ -36,6 +38,12 @@ router.put(
       price: req.body.price,
     });
     await crop.save();
+    new CropUpdatedPublisher(natsWrapper.client).publish({
+      id: crop.id,
+      title: crop.title,
+      price: crop.price,
+      userId: crop.userId
+    });
 
     res.send(crop);
   }

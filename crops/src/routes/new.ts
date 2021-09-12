@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@miepitome/common';
 import { Crop } from '../models/crops';
+import { CropCreatedPublisher } from "../events/publishers/crop-created-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 
 const router = express.Router();
@@ -25,6 +27,12 @@ router.post(
       userId: req.currentUser!.id,
     });
     await crop.save();
+    await new CropCreatedPublisher(natsWrapper.client).publish({
+      id: crop.id,
+      title: crop.title,
+      price: crop.price,
+      userId: crop.userId
+    });
 
     res.status(201).send(crop);
   }

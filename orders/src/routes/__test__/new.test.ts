@@ -17,7 +17,7 @@ it('returns an error if the crop does not exist', async () => {
 
 it('returns an error if the crop is already reserved', async () => {
   const crop = Crop.build({
-    title: 'concert',
+    title: 'rice',
     price: 20,
   });
   await crop.save();
@@ -38,7 +38,7 @@ it('returns an error if the crop is already reserved', async () => {
 
 it('reserves a crop', async () => {
   const crop = Crop.build({
-    title: 'concert',
+    title: 'rice',
     price: 20,
   });
   await crop.save();

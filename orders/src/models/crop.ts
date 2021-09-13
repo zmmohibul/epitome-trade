@@ -54,6 +54,8 @@ cropSchema.methods.isReserved = async function () {
       ],
     },
   });
+
+  return !!existingOrder;
 }
 
 const Crop = mongoose.model<CropDoc, CropModel>('Crop', cropSchema);

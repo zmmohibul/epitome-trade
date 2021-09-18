@@ -18,14 +18,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: us.gcr.io/epitome-trade/epitometrade-client
-      context: client
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: 'src/**/*.ts'
-            dest: .
+#    - image: us.gcr.io/epitome-trade/epitome-trade-client
+#      context: client
+#      docker:
+#        dockerfile: Dockerfile
+#      sync:
+#        manual:
+#          - src: 'src/**/*.ts'
+#            dest: .
     - image: us.gcr.io/epitome-trade/crops
       context: crops
       docker:

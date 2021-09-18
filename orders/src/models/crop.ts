@@ -3,6 +3,7 @@ import { Order } from "./order";
 import {OrderStatus} from "@miepitome/common";
 
 interface CropAttrs {
+  id: String;
   title: string;
   price: number;
 }
@@ -40,7 +41,11 @@ const cropSchema = new mongoose.Schema(
 );
 
 cropSchema.statics.build = (attrs: CropAttrs) => {
-  return new Crop(attrs);
+  return new Crop({
+    _id: attrs.id,
+    title: attrs.title,
+    price: attrs.price
+  });
 };
 
 cropSchema.methods.isReserved = async function () {

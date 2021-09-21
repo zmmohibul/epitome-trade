@@ -2,9 +2,12 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app';
 import { Crop } from '../../models/crop';
+import { Order } from '../../models/order';
+import { OrderStatus } from "@miepitome/common";
+import { natsWrapper } from '../../nats-wrapper';
 
-it('fetches the order', async () => {
-  // Create a crop
+it('marks an order as cancelled', async () => {
+  // create a crop with Crop Model
   const crop = Crop.build({
     id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
@@ -13,25 +16,27 @@ it('fetches the order', async () => {
   await crop.save();
 
   const user = global.signin();
-  // make a request to build an order with this crop
+  // make a request to create an order
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
     .send({ cropId: crop.id })
     .expect(201);
 
-  // make request to fetch the order
-  const { body: fetchedOrder } = await request(app)
-    .get(`/api/orders/${order.id}`)
+  // make a request to cancel the order
+  await request(app)
+    .delete(`/api/orders/${order.id}`)
     .set('Cookie', user)
     .send()
-    .expect(200);
+    .expect(204);
 
-  expect(fetchedOrder.id).toEqual(order.id);
+  // expectation to make sure the thing is cancelled
+  const updatedOrder = await Order.findById(order.id);
+
+  expect(updatedOrder!.status).toEqual(OrderStatus.Cancelled);
 });
 
-it('returns an error if one user tries to fetch another users order', async () => {
-  // Create a crop
+it('emits a order cancelled event', async () => {
   const crop = Crop.build({
     id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
@@ -40,17 +45,19 @@ it('returns an error if one user tries to fetch another users order', async () =
   await crop.save();
 
   const user = global.signin();
-  // make a request to build an order with this crop
+  // make a request to create an order
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
     .send({ cropId: crop.id })
     .expect(201);
 
-  // make request to fetch the order
+  // make a request to cancel the order
   await request(app)
-    .get(`/api/orders/${order.id}`)
-    .set('Cookie', global.signin())
+    .delete(`/api/orders/${order.id}`)
+    .set('Cookie', user)
     .send()
-    .expect(401);
+    .expect(204);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });

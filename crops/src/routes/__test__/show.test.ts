@@ -4,11 +4,12 @@ import mongoose from 'mongoose';
 
 it('returns a 404 if the crop is not found', async () => {
   const id = new mongoose.Types.ObjectId().toHexString();
+
   await request(app).get(`/api/crops/${id}`).send().expect(404);
 });
 
 it('returns the crop if the crop is found', async () => {
-  const title = 'rice';
+  const title = 'concert';
   const price = 20;
 
   const response = await request(app)

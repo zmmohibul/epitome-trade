@@ -31,7 +31,8 @@ router.post(
       id: crop.id,
       title: crop.title,
       price: crop.price,
-      userId: crop.userId
+      userId: crop.userId,
+      version: crop.version
     });
 
     res.status(201).send(crop);

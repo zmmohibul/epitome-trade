@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { Order } from "./order";
 import {OrderStatus} from "@miepitome/common";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 interface CropAttrs {
   id: String;
@@ -11,11 +12,13 @@ interface CropAttrs {
 export interface CropDoc extends mongoose.Document {
   title: string;
   price: number;
+  version: number;
   isReserved(): Promise<boolean>;
 }
 
 interface CropModel extends mongoose.Model<CropDoc> {
   build(attrs: CropAttrs): CropDoc;
+  findByEvent(event: { id: string, version: number }) : Promise<CropDoc | null>;
 }
 
 const cropSchema = new mongoose.Schema(
@@ -40,6 +43,15 @@ const cropSchema = new mongoose.Schema(
   }
 );
 
+cropSchema.set('versionKey', 'version');
+cropSchema.plugin(updateIfCurrentPlugin);
+
+cropSchema.statics.findByEvent = (event: { id: string, version: number }) => {
+  return Crop.findOne({
+    _id: event.id,
+    version: event.version - 1
+  });
+}
 cropSchema.statics.build = (attrs: CropAttrs) => {
   return new Crop({
     _id: attrs.id,

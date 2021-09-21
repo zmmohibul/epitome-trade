@@ -10,12 +10,12 @@ export class CropCreatedListener extends Listener<CropCreatedEvent> {
   async onMessage(data: CropCreatedEvent['data'], msg: Message) {
     const { id, title, price } = data;
 
-    const ticket = Crop.build({
+    const crop = Crop.build({
       id,
       title,
       price,
     });
-    await ticket.save();
+    await crop.save();
 
     msg.ack();
   }

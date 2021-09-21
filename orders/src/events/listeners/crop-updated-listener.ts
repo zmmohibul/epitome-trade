@@ -8,15 +8,15 @@ export class CropUpdatedListener extends Listener<CropUpdatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: CropUpdatedEvent['data'], msg: Message) {
-    const ticket = await Crop.findById(data.id);
+    const crop = await Crop.findByEvent(data);
 
-    if (!ticket) {
+    if (!crop) {
       throw new Error('Crop not found');
     }
 
     const { title, price } = data;
-    ticket.set({ title, price });
-    await ticket.save();
+    crop.set({ title, price });
+    await crop.save();
 
     msg.ack();
   }

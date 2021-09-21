@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
-import { Crop } from '../../models/crops';
+import { Crop } from "../../models/crops";
+import { natsWrapper } from '../../nats-wrapper';
 
 it('has a route handler listening to /api/crops for post requests', async () => {
   const response = await request(app).post('/api/crops').send({});
@@ -59,7 +60,7 @@ it('returns an error if an invalid price is provided', async () => {
     .expect(400);
 });
 
-it('creates a ticket with valid inputs', async () => {
+it('creates a crop with valid inputs', async () => {
   let crops = await Crop.find({});
   expect(crops.length).toEqual(0);
 
@@ -78,4 +79,19 @@ it('creates a ticket with valid inputs', async () => {
   expect(crops.length).toEqual(1);
   expect(crops[0].price).toEqual(20);
   expect(crops[0].title).toEqual(title);
+});
+
+it('publishes an event', async () => {
+  const title = 'asldkfj';
+
+  await request(app)
+    .post('/api/crops')
+    .set('Cookie', global.signin())
+    .send({
+      title,
+      price: 20,
+    })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
